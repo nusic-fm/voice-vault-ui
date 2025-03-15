@@ -43,14 +43,9 @@ const Decryption = ({
         const audioBlob = await response.data.blob();
         audioUrl = URL.createObjectURL(audioBlob);
       } catch (error) {
-        if (walletAddress !== "0x429b697b0Bc1491F298C997140B62760ad2B0E17") {
-          console.error("Error:", error);
-          alert("TEE is currenly under maintenance. Please try again later.");
-          return;
-        } else {
-          audioUrl =
-            "https://storage.googleapis.com/ava_emotions/source/abandoned.wav"; // For Demo
-        }
+        console.error("Error:", error);
+        alert("TEE is currenly under maintenance. Please try again later.");
+        return;
       }
 
       // Create and play audio

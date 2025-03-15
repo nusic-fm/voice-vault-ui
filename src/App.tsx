@@ -769,7 +769,7 @@ export default function App() {
                 <div className="step-number">5</div>
                 <span>Complete</span>
               </div>
-              {!walletAddress && (
+              {!walletAddress && currentStep !== "mint" && (
                 <button
                   className="connect-wallet-button"
                   onClick={async () => {
