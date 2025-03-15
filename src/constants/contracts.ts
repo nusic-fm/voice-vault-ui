@@ -1,16 +1,42 @@
 export const FACTORY_CONTRACT_ABI = [
   {
-    name: "createVoiceVault",
-    type: "function",
     inputs: [
-      { name: "initialOwner", type: "address" },
-      { name: "cid", type: "string" },
-      { name: "name", type: "string" },
-      { name: "symbol", type: "string" },
-      { name: "baseUri", type: "string" },
+      {
+        internalType: "address",
+        name: "initialOwner",
+        type: "address",
+      },
+      {
+        internalType: "string",
+        name: "_cid",
+        type: "string",
+      },
+      {
+        internalType: "string",
+        name: "_name",
+        type: "string",
+      },
+      {
+        internalType: "string",
+        name: "_symbol",
+        type: "string",
+      },
+      {
+        internalType: "string",
+        name: "_baseUri",
+        type: "string",
+      },
     ],
-    outputs: [],
+    name: "createVoiceVault",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
     stateMutability: "nonpayable",
+    type: "function",
   },
 ];
 

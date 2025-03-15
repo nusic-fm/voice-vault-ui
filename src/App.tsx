@@ -56,7 +56,7 @@ export default function App() {
   // Add these new state variables inside App component
   const [walletAddress, setWalletAddress] = useState<string>("");
   const [isWalletConnected, setIsWalletConnected] = useState(false);
-  const [nftContractAddress, setNftContractAddress] = useState<string>("d");
+  const [nftContractAddress, setNftContractAddress] = useState<string>("");
   const [deploymentError, setDeploymentError] = useState<string>("");
 
   // Add these new state variables at the top with other states
@@ -610,20 +610,25 @@ export default function App() {
 
       // Deploy contract if not already deployed
       if (!nftContractAddress) {
-        // Call API for
+        // Get the recorded audio blob from audioChunksRef
+        const audioBlob = new Blob(audioChunksRef.current, {
+          type: "audio/webm",
+        });
+
         const messageToSign = `Sign in to VoiceVault, this proves you own this wallet address`;
         const signature = await signMessageWithWalletAddress(messageToSign);
         const formData = new FormData();
-        formData.append("file", new Blob([]));
+        formData.append("file", audioBlob); // Send the actual audio blob instead of empty blob
         formData.append("signature", signature);
         formData.append("address", walletAddress);
         formData.append("message", messageToSign);
 
-        const response = await axios.post(
-          `${import.meta.env.VITE_TEE_SERVER}/upload-encrypted-audio`,
-          formData
-        );
-        const cid = response.data.cid;
+        // const response = await axios.post(
+        //   `${import.meta.env.VITE_TEE_SERVER}/upload-encrypted-audio`,
+        //   formData
+        // );
+        const cid =
+          "response.data.cidQmeDNA51DYmpuzi24fcDKjMYUpVMxbNadaDTFaNq3QRzRy";
         const contract = await deployAIVoiceNFT(
           walletAddress,
           cid,
@@ -631,7 +636,11 @@ export default function App() {
           "VVOICE",
           ""
         );
-        setNftContractAddress(contract.target.toString());
+        window.open(
+          `https://aeneid.storyscan.xyz/tx/${contract.hash.toString()}`,
+          "_blank"
+        );
+        setNftContractAddress(contract.hash.toString());
         console.log("Contract deployed at:", contract.target);
       }
 
@@ -916,15 +925,15 @@ export default function App() {
       </div>
 
       <footer>
-        <p>VoiceVault © 2023 | Powered by Blockchain Technology</p>
+        <p>VoiceVault © 2025 | Powered by Blockchain Technology</p>
       </footer>
-      <button
+      {/* <button
         onClick={() =>
           deployAIVoiceNFT(walletAddress, "cid", "name", "symbol", "baseUri")
         }
       >
         Sign Message
-      </button>
+      </button> */}
     </main>
   );
 }

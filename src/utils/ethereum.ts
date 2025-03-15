@@ -69,10 +69,9 @@ export const deployAIVoiceNFT = async (
     FACTORY_CONTRACT_ABI,
     signer
   );
-  const tx = await contract.deployAIVoiceNFT(
+  const tx = await contract.createVoiceVault(
     signer.address,
     cid,
-    name,
     name,
     symbol,
     baseUri
