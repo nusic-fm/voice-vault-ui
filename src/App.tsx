@@ -16,10 +16,12 @@ import {
   connectWallet,
   signMessageWithWalletAddress,
   deployAIVoiceNFT,
+  getVaultAddress,
 } from "./utils/ethereum";
 import { Step, Message } from "./types";
 import ChatBot from "./components/ChatBot";
 import axios from "axios";
+import Decryption from "./components/Decryption";
 
 export default function App() {
   const [currentStep, setCurrentStep] = useState<Step>("welcome");
@@ -63,6 +65,22 @@ export default function App() {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
+  const [showDecryption, setShowDecryption] = useState(false);
+  const [vaultAddress, setVaultAddress] = useState<string>("");
+
+  const fetchNFTContractAddress = async () => {
+    if (walletAddress) {
+      const _vaultAddress = await getVaultAddress(walletAddress);
+      if (_vaultAddress !== "0x0000000000000000000000000000000000000000") {
+        setShowDecryption(true);
+        setVaultAddress(_vaultAddress);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchNFTContractAddress();
+  }, [walletAddress]);
 
   // Three.js visualizer setup - SIMPLIFIED VERSION
   useEffect(() => {
@@ -704,53 +722,73 @@ export default function App() {
       <div className="content-container">
         <div className="left-panel">
           <div className="visualizer-container" id="visualizer-container"></div>
-          <div className="step-indicator">
-            <div
-              className={`step ${currentStep === "welcome" ? "active" : ""} ${
-                currentStep !== "welcome" ? "completed" : ""
-              }`}
-            >
-              <div className="step-number">1</div>
-              <span>Welcome</span>
+          {!showDecryption ? (
+            <div className="step-indicator">
+              <div
+                className={`step ${currentStep === "welcome" ? "active" : ""} ${
+                  currentStep !== "welcome" ? "completed" : ""
+                }`}
+              >
+                <div className="step-number">1</div>
+                <span>Welcome</span>
+              </div>
+              <div
+                className={`step ${currentStep === "record" ? "active" : ""} ${
+                  ["mint", "email", "complete"].includes(currentStep)
+                    ? "completed"
+                    : ""
+                }`}
+              >
+                <div className="step-number">2</div>
+                <span>
+                  Record{" "}
+                  {currentStep === "record" && !recordingComplete && (
+                    <span className="step-required">● REQUIRED</span>
+                  )}
+                </span>
+              </div>
+              <div
+                className={`step ${currentStep === "mint" ? "active" : ""} ${
+                  ["email", "complete"].includes(currentStep) ? "completed" : ""
+                }`}
+              >
+                <div className="step-number">3</div>
+                <span>Mint NFT</span>
+              </div>
+              <div
+                className={`step ${currentStep === "email" ? "active" : ""} ${
+                  currentStep === "complete" ? "completed" : ""
+                }`}
+              >
+                <div className="step-number">4</div>
+                <span>Subscribe</span>
+              </div>
+              <div
+                className={`step ${currentStep === "complete" ? "active" : ""}`}
+              >
+                <div className="step-number">5</div>
+                <span>Complete</span>
+              </div>
+              {!walletAddress && (
+                <button
+                  className="connect-wallet-button"
+                  onClick={async () => {
+                    const address = await connectWallet();
+                    setWalletAddress(address);
+                    setIsWalletConnected(true);
+                  }}
+                >
+                  Connect Wallet
+                </button>
+              )}
             </div>
-            <div
-              className={`step ${currentStep === "record" ? "active" : ""} ${
-                ["mint", "email", "complete"].includes(currentStep)
-                  ? "completed"
-                  : ""
-              }`}
-            >
-              <div className="step-number">2</div>
-              <span>
-                Record{" "}
-                {currentStep === "record" && !recordingComplete && (
-                  <span className="step-required">● REQUIRED</span>
-                )}
-              </span>
-            </div>
-            <div
-              className={`step ${currentStep === "mint" ? "active" : ""} ${
-                ["email", "complete"].includes(currentStep) ? "completed" : ""
-              }`}
-            >
-              <div className="step-number">3</div>
-              <span>Mint NFT</span>
-            </div>
-            <div
-              className={`step ${currentStep === "email" ? "active" : ""} ${
-                currentStep === "complete" ? "completed" : ""
-              }`}
-            >
-              <div className="step-number">4</div>
-              <span>Subscribe</span>
-            </div>
-            <div
-              className={`step ${currentStep === "complete" ? "active" : ""}`}
-            >
-              <div className="step-number">5</div>
-              <span>Complete</span>
-            </div>
-          </div>
+          ) : (
+            <Decryption
+              walletAddress={walletAddress}
+              vaultAddress={vaultAddress}
+              goBack={() => setShowDecryption(false)}
+            />
+          )}
 
           <div className="interaction-panel">
             {currentStep === "record" && (

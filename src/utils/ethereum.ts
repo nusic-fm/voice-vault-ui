@@ -80,6 +80,28 @@ export const deployAIVoiceNFT = async (
   return tx;
 };
 
+export const getVaultAddress = async (walletAddress: string) => {
+  const provider = new ethers.BrowserProvider(window.ethereum);
+  const contract = new Contract(
+    import.meta.env.VITE_FACTORY_ADDRESS,
+    FACTORY_CONTRACT_ABI,
+    provider
+  );
+  const vaultAddress = await contract.voiceVaults(walletAddress);
+  return vaultAddress;
+};
+
+export const getVoiceVaultCid = async (voiceVaultAddress: string) => {
+  const provider = new ethers.BrowserProvider(window.ethereum);
+  const contract = new Contract(
+    import.meta.env.VITE_FACTORY_ADDRESS,
+    FACTORY_CONTRACT_ABI,
+    provider
+  );
+  const cid = await contract.cidByVoiceVaults(voiceVaultAddress);
+  return cid;
+};
+
 export const signMessageWithWalletAddress = async (messageToSign: string) => {
   const provider = new ethers.BrowserProvider(window.ethereum);
   const signer = await provider.getSigner();
